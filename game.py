@@ -13,13 +13,14 @@ class Board:
     def __init__(self,size):
         self.size = size
         self.score = 0
+        self.best_tile = 2
         self.board = np.zeros((size,size),dtype='int')
         r1 = random.randint(0, size-1)
         c1 = random.randint(0, size-1)
         r2 = random.randint(0, size-1)
         c2 = random.randint(0, size-1)
         if (r1 == r2 and c1 == c2):
-            r2 = r2+1%size
+            r2 = (r2+1)%size
         self.board[r1,c1] = 2
         self.board[r2,c2] = 2
         self.board_history = [self.board]
@@ -41,6 +42,8 @@ class Board:
                     self.board[i,j] += self.board[i,j]
                     self.board[i,j+1] = 0
                     self.score += self.board[i,j]
+                    if (self.board[i,j] > self.best_tile):
+                        self.best_tile = self.board[i,j]
                     
     def flip(self):
         temp = np.zeros((self.size,self.size), dtype='int')
@@ -53,7 +56,7 @@ class Board:
         self.board = self.board.T                    
         
     def add_number(self):
-        if ((self.board==0).any() and not np.array_equal(self.board_history[-1], self.board)):
+        if (self.valid()):
             row = random.randint(0, self.size-1)
             num = self.generate()
             flag = True
@@ -66,6 +69,9 @@ class Board:
                 row = random.randint(0, self.size-1)
         else:
             pass
+    
+    def valid(self):
+        return ((self.board==0).any() and not np.array_equal(self.board_history[-1], self.board))
         
     def generate(self):
         n = random.random()
